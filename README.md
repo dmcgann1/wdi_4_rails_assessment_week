@@ -6,7 +6,9 @@ Fork this repository, update this file to include your answers, and submit a pul
 
 resources :houses do
   resources :students
+end
 
+*Correct
 
 2. Write a migration to create a `students` table with columns for name, age, and something to link the student to the `House` they belong to.
 
@@ -16,13 +18,17 @@ create_table :students do |t|
   t.text :name
   t.integer :age
   t.references :house, index: true
-  end
+end
+
+*Correct
 
 
 3. Assuming a Student can only be in a single House, what kind of associations should I define on these models? Do I need to introduce any new models, and if so, what associations should I define on those?
 
 Student model: belongs_to :house
 House model: has_many :students
+
+*Correct
 
 
 4. Now I want Students to be able to enroll in Courses. What kind of associations should I define on these models? Do I need to introduce any new models, and if so, what associations should I define on those?
@@ -33,6 +39,23 @@ Course model: has_many :students
 Student model:  has_many :courses
                 belongs_to :course
 
+*Incorrect
+
+*Solution: many to many relationship (need the intermediate model and use has_many through)
+
+Student model:
+  has_many :enrollments
+  has_many :courses, through: :enrollments
+
+Course model:
+  has_many :enrollments
+  has_many :students, through: :enrollments
+
+class Enrollment
+  belongs_to :student
+  belongs_to :course
+end
+
 
 5. I want Students to be able to leave Comments on both Courses and Professors. What kind of associations should I define on these models? Do I need to introduce any new models, and if so, what associations should I define on those?
 
@@ -42,11 +65,18 @@ Comment model: belongs_to :student
 Course model: has_many :comments, as: :commentable
 Professor model: has_many :comments, as: :commentable
 
+*Correct
+
 
 6. When creating a new Student in my students controller, assuming I have a `student_params` method and the house the student should belong to is stored in `@house`, what code should I write to link the student to the house?
 
 @student.house_id = params[:house_id]
 @student.house_id = @house.id
+
+*Incorrect
+
+Solution: @student = Student.new(student_params)
+          @student.house = @house
 
 
 7. If I'm using Devise with a User model, what code should I write in a controller or view to find out whether a user is signed in? And how can I get a reference to the currently-signed-in user?
@@ -55,16 +85,27 @@ if user_signed_in?
 
 current_user
 
+*Correct
 
 8. If I'm using Devise with a User model, what code should I write in my students controller so that only signed-in users can access the `new` and `create` actions?
 
 before_action :authenticate_user!, only [:new, :create]
 
+*Correct
+
 9. When I deploy a new version of my app to Heroku that contains a new migration, how can I run that migration on my production database?
 
 heroku run rake db:migrate
+
+*Correct
 
 
 10. If accessing my app on Heroku gives me an uninformative "something went wrong" error message, how can I find out what the real error is?
 
 heroku help
+
+*Incorrect
+
+*Solution
+
+heroku logs
